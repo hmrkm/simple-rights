@@ -1,0 +1,51 @@
+openapi: 3.1.0
+info:
+  title: simple-rights
+  version: '1.0'
+  contact:
+    name: dummy
+  description: シンプルな権限
+servers:
+  - url: 'http://localhost:80'
+paths:
+  /v1/rights:
+    parameters: []
+    post:
+      summary: 権限問い合わせ
+      operationId: post-v1-rights
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Bad Request
+        '403':
+          description: Forbidden
+        '500':
+          description: Internal Server Error
+      description: ユーザーがリソースの対して権限を持っているか判定する
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequestRights'
+      parameters: []
+components:
+  schemas:
+    RequestRights:
+      title: RequestRights
+      type: object
+      description: 権限問い合わせリクエスト
+      properties:
+        user_id:
+          type: string
+          description: ユーザーID
+        resource:
+          type: string
+          description: リソース
+      required:
+        - user_id
+        - resource
+  responses: {}
+  parameters: {}
+tags:
+  - name: adapter
