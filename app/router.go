@@ -16,8 +16,8 @@ func Router(e *echo.Echo, ra adapter.Rights) {
 
 		if err != nil {
 			return ErrorHandler(c, err)
-		} else {
-			return c.JSON(200, nil)
 		}
+
+		return c.JSON(200, nil)
 	})
 }

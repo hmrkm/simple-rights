@@ -6,10 +6,6 @@ import (
 )
 
 func ErrorHandler(c echo.Context, err error) error {
-	if err == nil {
-		return nil
-	}
-
 	switch err {
 	case domain.ErrNotFound:
 		return c.JSON(404, nil)
