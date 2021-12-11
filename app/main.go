@@ -2,7 +2,6 @@ package main
 
 import (
 	"github.com/hmrkm/simple-rights/adapter"
-	"github.com/hmrkm/simple-rights/domain"
 	"github.com/hmrkm/simple-rights/io"
 	"github.com/hmrkm/simple-rights/usecase"
 	"github.com/labstack/echo/v4"
@@ -33,8 +32,7 @@ func main() {
 	mysql := io.NewMysql(db)
 	defer mysql.Close()
 
-	rd := domain.NewRights(mysql)
-	ru := usecase.NewRights(rd)
+	ru := usecase.NewRights(mysql)
 	ra := adapter.NetRights(ru)
 
 	e := echo.New()

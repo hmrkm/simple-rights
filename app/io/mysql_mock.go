@@ -7,7 +7,7 @@ import (
 )
 
 type MockTable struct {
-	Id   string
+	ID   string
 	Name string
 }
 

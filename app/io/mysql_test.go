@@ -84,11 +84,11 @@ func TestClose(t *testing.T) {
 	}
 }
 
-func TestFind(t *testing.T) {
+func TestLoad(t *testing.T) {
 	testCases := []struct {
 		name        string
 		cond        MockTable
-		dbId        string
+		dbID        string
 		dbName      string
 		expected    MockTable
 		expectedErr error
@@ -96,11 +96,11 @@ func TestFind(t *testing.T) {
 		{
 
 			"正常ケース",
-			MockTable{Id: "1"},
+			MockTable{ID: "1"},
 			"1",
 			"aaa",
 			MockTable{
-				Id:   "1",
+				ID:   "1",
 				Name: "aaa",
 			},
 			nil,
@@ -113,11 +113,11 @@ func TestFind(t *testing.T) {
 
 			actual := MockTable{}
 			sqlMock.ExpectQuery(regexp.QuoteMeta(
-				"SELECT * FROM `mock_tables` WHERE id=(?)",
+				"SELECT * FROM `mock_tables` WHERE `mock_tables`.`id` = ?",
 			)).
-				WithArgs(tc.cond.Id).
+				WithArgs(tc.cond.ID).
 				WillReturnRows(sqlmock.NewRows([]string{"id", "name"}).
-					AddRow(tc.dbId, tc.dbName))
+					AddRow(tc.dbID, tc.dbName))
 
 			actualErr := mysql.Load(&actual, tc.cond)
 
