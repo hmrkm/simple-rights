@@ -20,21 +20,3 @@ CREATE TABLE `user_roles` (
   `user_id` varchar(16) NOT NULL COMMENT 'ユーザーID',
   `role_id` varchar(16) NOT NULL COMMENT 'ロールID'
 ) ENGINE = InnoDB DEFAULT CHARSET = latin1;
-insert into resources (id, path)
-values ('a', 'aaa'),
-  ('b', 'bbb'),
-  ('c', 'ccc');
-insert into roles (id, name)
-values ('x', 'xxx'),
-  ('y', 'yyy'),
-  ('z', 'zzz');
-insert into `permissions` (resource_id, role_id)
-values ('a', 'x'),
-  ('b', 'y'),
-  ('c', 'z'),
-  ('a', 'y'),
-  ('a', 'z');
-insert into user_roles (user_id, role_id)
-values ('1', 'x'),
-  ('2', 'y'),
-  ('3', 'z');
