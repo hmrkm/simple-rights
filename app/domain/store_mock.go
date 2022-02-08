@@ -46,17 +46,3 @@ func (mr *MockStoreMockRecorder) Load(destAddr, cond interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Load", reflect.TypeOf((*MockStore)(nil).Load), destAddr, cond)
 }
-
-// LoadWith mocks base method.
-func (m *MockStore) LoadWith(destAddr, destCond interface{}, withModelName string, withCond interface{}) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "LoadWith", destAddr, destCond, withModelName, withCond)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// LoadWith indicates an expected call of LoadWith.
-func (mr *MockStoreMockRecorder) LoadWith(destAddr, destCond, withModelName, withCond interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "LoadWith", reflect.TypeOf((*MockStore)(nil).LoadWith), destAddr, destCond, withModelName, withCond)
-}

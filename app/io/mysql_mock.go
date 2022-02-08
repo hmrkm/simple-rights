@@ -7,8 +7,9 @@ import (
 )
 
 type MockTable struct {
-	ID   string
-	Name string
+	ID             string
+	Name           string
+	MockSubTableID string
 }
 
 func NewMysqlMock() (Mysql, sqlmock.Sqlmock) {

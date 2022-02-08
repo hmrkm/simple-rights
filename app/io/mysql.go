@@ -32,16 +32,3 @@ func (m Mysql) Close() error {
 func (m Mysql) Load(destAddr interface{}, cond interface{}) error {
 	return m.conn.Where(cond).Find(destAddr).Error
 }
-
-func (m Mysql) LoadWith(destAddr interface{}, destCond interface{}, withModelName string, withCond interface{}) error {
-	if destCond == nil {
-		if withCond == nil {
-			return m.conn.Joins(withModelName).Find(destAddr).Error
-		}
-		return m.conn.Joins(withModelName, m.conn.Where(withCond)).Find(destAddr).Error
-	}
-	if withCond == nil {
-		return m.conn.Joins(withModelName).Where(destCond).Find(destAddr).Error
-	}
-	return m.conn.Joins(withModelName, m.conn.Where(withCond)).Where(destCond).Find(destAddr).Error
-}
