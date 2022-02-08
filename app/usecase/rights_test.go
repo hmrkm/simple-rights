@@ -5,10 +5,13 @@ import (
 	"testing"
 
 	gomock "github.com/golang/mock/gomock"
+	"github.com/google/go-cmp/cmp"
+	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/hmrkm/simple-rights/domain"
 )
 
 func TestVerify(t *testing.T) {
+	err := errors.New("")
 	testCases := []struct {
 		name              string
 		userID            string
@@ -25,7 +28,9 @@ func TestVerify(t *testing.T) {
 			"正常ケース",
 			"userA",
 			"path",
-			[]domain.UserRole{},
+			[]domain.UserRole{
+				{},
+			},
 			nil,
 			domain.Resource{},
 			nil,
@@ -45,7 +50,45 @@ func TestVerify(t *testing.T) {
 			nil,
 			domain.ErrNotAuthorized,
 		},
+		{
+			"UserRole取得失敗の異常ケース",
+			"userA",
+			"path",
+			[]domain.UserRole{},
+			err,
+			domain.Resource{},
+			nil,
+			[]domain.Permission{},
+			nil,
+			err,
+		},
+		{
+			"Resource取得失敗の異常ケース",
+			"userA",
+			"path",
+			[]domain.UserRole{},
+			nil,
+			domain.Resource{},
+			err,
+			[]domain.Permission{},
+			nil,
+			err,
+		},
+		{
+			"Permission取得失敗の異常ケース",
+			"userA",
+			"path",
+			[]domain.UserRole{},
+			nil,
+			domain.Resource{},
+			nil,
+			[]domain.Permission{},
+			err,
+			err,
+		},
 	}
+
+	opts := []cmp.Option{cmpopts.EquateErrors()}
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
@@ -53,36 +96,48 @@ func TestVerify(t *testing.T) {
 			defer ctrl.Finish()
 
 			sm := domain.NewMockStore(ctrl)
-			sm.EXPECT().Load(gomock.Any(), gomock.Any()).DoAndReturn(
-				func(target *[]domain.UserRole, cond *domain.UserRole) error {
-					if tc.loadUserRoleErr == nil {
-						*target = tc.loadUserRole
-					}
-					return tc.loadUserRoleErr
-				},
-			)
-			sm.EXPECT().Load(gomock.Any(), gomock.Any()).DoAndReturn(
-				func(target *domain.Resource, cond *domain.Resource) error {
-					if tc.loadResourceErr == nil {
-						*target = tc.loadResource
-					}
-					return tc.loadResourceErr
-				},
-			)
-			sm.EXPECT().Load(gomock.Any(), gomock.Any()).DoAndReturn(
-				func(target *[]domain.Permission, cond map[string]interface{}) error {
-					if tc.loadPermissionErr == nil {
-						*target = tc.loadPermission
-					}
-					return tc.loadPermissionErr
-				},
-			)
+
+			expect := func() {
+				sm.EXPECT().Load(gomock.Any(), gomock.Any()).DoAndReturn(
+					func(target *[]domain.UserRole, cond *domain.UserRole) error {
+						if tc.loadUserRoleErr == nil {
+							*target = tc.loadUserRole
+						}
+						return tc.loadUserRoleErr
+					},
+				)
+				if tc.loadUserRoleErr != nil {
+					return
+				}
+				sm.EXPECT().Load(gomock.Any(), gomock.Any()).DoAndReturn(
+					func(target *domain.Resource, cond *domain.Resource) error {
+						if tc.loadResourceErr == nil {
+							*target = tc.loadResource
+						}
+						return tc.loadResourceErr
+					},
+				)
+				if tc.loadResourceErr != nil {
+					return
+				}
+				sm.EXPECT().Load(gomock.Any(), gomock.Any()).DoAndReturn(
+					func(target *[]domain.Permission, cond map[string]interface{}) error {
+						if tc.loadPermissionErr == nil {
+							*target = tc.loadPermission
+						}
+						return tc.loadPermissionErr
+					},
+				)
+			}
+
+			expect()
+
 			ru := NewRights(sm)
 
 			actualErr := ru.Verify(tc.userID, tc.path)
 
-			if !errors.Is(actualErr, tc.expectedErr) {
-				t.Errorf("Verify() actualErr: %v, ecpectedErr: %v", actualErr, tc.expectedErr)
+			if diff := cmp.Diff(actualErr, tc.expectedErr, opts...); diff != "" {
+				t.Errorf("Verify() error miss match : %s", diff)
 			}
 		})
 	}
